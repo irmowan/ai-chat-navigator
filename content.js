@@ -192,6 +192,8 @@ class ChatGPTTurnNavigator {
 
     this.setupResizeHandle();
 
+    this.restoreState();
+
     console.log('[ChatGPT Turn Navigator] Sidebar created');
   }
 
