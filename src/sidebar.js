@@ -25,6 +25,11 @@ class Sidebar {
     this.element.id = 'chatgpt-turn-finder-sidebar';
     this.element.className = 'ctn-sidebar';
 
+    // Apply initial hidden state if needed (before appending to DOM)
+    if (!this.isVisible) {
+      this.element.classList.add('ctn-hidden');
+    }
+
     this.element.innerHTML = `
       <div class="ctn-resize-handle" title="${this.i18n.getText('resize')}"></div>
       <div class="ctn-header">
@@ -194,15 +199,23 @@ class Sidebar {
     }
   }
 
-  // Restore visibility state
-  restoreState() {
-    chrome.storage.local.get(['sidebarVisible'], (result) => {
-      if (result.sidebarVisible === false) {
-        this.isVisible = false;
-        this.element.classList.add('ctn-hidden');
-        this.expandButton.classList.remove('ctn-hidden');
-      }
+  // Restore visibility state (synchronous, called before create)
+  async restoreState() {
+    return new Promise((resolve) => {
+      chrome.storage.local.get(['sidebarVisible'], (result) => {
+        if (result.sidebarVisible === false) {
+          this.isVisible = false;
+        }
+        resolve();
+      });
     });
+  }
+
+  // Update expand button visibility (called after sidebar is created)
+  updateExpandButtonVisibility() {
+    if (!this.isVisible && this.expandButton) {
+      this.expandButton.classList.remove('ctn-hidden');
+    }
   }
 
   // Setup resize handle

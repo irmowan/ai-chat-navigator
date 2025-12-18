@@ -22,11 +22,14 @@ class Navigator {
   }
 
   // Start navigation system
-  start() {
-    setTimeout(() => {
+  async start() {
+    setTimeout(async () => {
+      // Restore state before creating UI to prevent flashing
+      await this.sidebar.restoreState();
+
       this.sidebar.create();
-      this.sidebar.restoreState();
-      
+      this.sidebar.updateExpandButtonVisibility();
+
       // Setup sidebar callbacks
       this.sidebar.onItemClick = (index) => this.scrollToQuery(index);
       this.sidebar.onSearch = (term) => this.sidebar.filter(term);
@@ -35,7 +38,7 @@ class Navigator {
       this.startObserving();
       this.setupScrollListener();
       this.setupUrlChangeDetection();
-      
+
       console.log('[ChatGPT Turn Navigator] Started successfully');
     }, 1000);
   }

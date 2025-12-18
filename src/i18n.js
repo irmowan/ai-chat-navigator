@@ -9,15 +9,15 @@ class I18n {
   detectLanguage() {
     // Try to get language from HTML lang attribute
     let lang = document.documentElement.lang;
-    
+
     // Fallback to browser language
     if (!lang) {
       lang = navigator.language || navigator.userLanguage || 'en';
     }
-    
+
     // Simplify to main language code (e.g., "zh-CN" -> "zh")
     lang = lang.split('-')[0].toLowerCase();
-    
+
     // Only support zh and en
     return lang === 'zh' ? 'zh' : 'en';
   }
@@ -74,7 +74,7 @@ class I18n {
         reloaded: '已重新加载新对话的查询'
       }
     };
-    
+
     return texts[this.language][key] || texts.en[key] || key;
   }
 }
