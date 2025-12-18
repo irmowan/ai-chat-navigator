@@ -18,7 +18,7 @@ A Chrome extension that adds a navigation sidebar to ChatGPT conversations, help
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/yourusername/chatgpt-turn-navigator.git
+   git clone https://github.com/irmowan/chatgpt-turn-navigator.git
    cd chatgpt-turn-navigator
    ```
 
