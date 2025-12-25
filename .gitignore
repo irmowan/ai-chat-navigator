@@ -1,14 +1,8 @@
-# Development scripts
-scripts/
-
-# Documentation
-docs/
-
-# GitHub workflows and config
-.github/
-
-# Node modules (if any)
+# Node modules
 node_modules/
+
+# Playwright MCP
+.playwright-mcp/
 
 # OS files
 .DS_Store
