@@ -37,6 +37,11 @@ class Sidebar {
       this.element.classList.add('ctn-hidden');
     }
 
+    // Apply initial hidden state if needed (before appending to DOM)
+    if (!this.isVisible) {
+      this.element.classList.add('ctn-hidden');
+    }
+
     this.element.innerHTML = `
       <div class="ctn-resize-handle" title="${this.i18n.getText('resize')}"></div>
       <div class="ctn-header">
@@ -164,7 +169,7 @@ class Sidebar {
     // Use platform-specific insertion points if adapter is available
     if (this.adapter && typeof this.adapter.getExpandButtonInsertionPoints === 'function') {
       const insertionPoints = this.adapter.getExpandButtonInsertionPoints();
-      
+
       for (const point of insertionPoints) {
         const targetElement = document.querySelector(point.selector);
         if (targetElement) {
@@ -239,7 +244,7 @@ class Sidebar {
     return new Promise((resolve) => {
       const visibilityKey = this.getStorageKey('sidebarVisible');
       const widthKey = this.getStorageKey('sidebarWidth');
-      
+
       chrome.storage.local.get([visibilityKey, widthKey], (result) => {
         if (result[visibilityKey] === false) {
           this.isVisible = false;

@@ -53,7 +53,7 @@ class Navigator {
     console.log(`${this.adapter.getLogPrefix()} Attempting to apply custom styles...`);
     const customStyles = this.adapter.getCustomStyles();
     console.log(`${this.adapter.getLogPrefix()} Custom styles content:`, customStyles);
-    
+
     if (customStyles && customStyles.trim()) {
       const styleId = 'ctn-platform-styles';
       // Remove existing style if any
