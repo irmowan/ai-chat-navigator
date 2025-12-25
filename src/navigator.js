@@ -1,9 +1,10 @@
 // Core navigation logic module
 
 class Navigator {
-  constructor(i18n, sidebar) {
+  constructor(i18n, sidebar, adapter) {
     this.i18n = i18n;
     this.sidebar = sidebar;
+    this.adapter = adapter;
     this.queries = [];
     this.observer = null;
     this.currentActiveIndex = -1;
@@ -12,7 +13,7 @@ class Navigator {
 
   // Initialize navigator
   init() {
-    console.log('[ChatGPT Turn Navigator] Initializing...');
+    console.log(`${this.adapter.getLogPrefix()} Initializing...`);
 
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => this.start());
@@ -22,11 +23,18 @@ class Navigator {
   }
 
   // Start navigation system
-  start() {
-    setTimeout(() => {
+  async start() {
+    const delay = this.adapter.getInitializationDelay();
+    setTimeout(async () => {
+      // Restore state before creating UI to prevent flashing
+      await this.sidebar.restoreState();
+
       this.sidebar.create();
-      this.sidebar.restoreState();
-      
+      this.sidebar.updateExpandButtonVisibility();
+
+      // Apply platform-specific custom styles
+      this.applyCustomStyles();
+
       // Setup sidebar callbacks
       this.sidebar.onItemClick = (index) => this.scrollToQuery(index);
       this.sidebar.onSearch = (term) => this.sidebar.filter(term);
@@ -35,25 +43,46 @@ class Navigator {
       this.startObserving();
       this.setupScrollListener();
       this.setupUrlChangeDetection();
-      
-      console.log('[ChatGPT Turn Navigator] Started successfully');
-    }, 1000);
+
+      console.log(`${this.adapter.getLogPrefix()} Started successfully`);
+    }, delay);
+  }
+
+  // Apply platform-specific custom styles
+  applyCustomStyles() {
+    console.log(`${this.adapter.getLogPrefix()} Attempting to apply custom styles...`);
+    const customStyles = this.adapter.getCustomStyles();
+    console.log(`${this.adapter.getLogPrefix()} Custom styles content:`, customStyles);
+    
+    if (customStyles && customStyles.trim()) {
+      const styleId = 'ctn-platform-styles';
+      // Remove existing style if any
+      const existingStyle = document.getElementById(styleId);
+      if (existingStyle) {
+        existingStyle.remove();
+        console.log(`${this.adapter.getLogPrefix()} Removed existing styles`);
+      }
+
+      // Inject new styles
+      const styleElement = document.createElement('style');
+      styleElement.id = styleId;
+      styleElement.textContent = customStyles;
+      document.head.appendChild(styleElement);
+      console.log(`${this.adapter.getLogPrefix()} Applied custom styles successfully`);
+    } else {
+      console.log(`${this.adapter.getLogPrefix()} No custom styles to apply`);
+    }
   }
 
   // Scan existing queries on page
   scanExistingQueries() {
-    const selectors = [
-      '[data-message-author-role="user"]',
-      '.text-message[data-message-author-role="user"]',
-      'div[data-testid^="conversation-turn"] [data-message-author-role="user"]',
-      '.agent-turn .whitespace-pre-wrap',
-    ];
+    const selectors = this.adapter.getMessageSelectors();
 
     let userMessages = [];
     for (const selector of selectors) {
       userMessages = document.querySelectorAll(selector);
       if (userMessages.length > 0) {
-        console.log(`[ChatGPT Turn Navigator] Found ${userMessages.length} ${this.i18n.getText('found')}`);
+        console.log(`${this.adapter.getLogPrefix()} Found ${userMessages.length} ${this.i18n.getText('found')}`);
         break;
       }
     }
@@ -64,7 +93,7 @@ class Navigator {
         const text = msg.textContent.trim();
         return text.length > 0 && !msg.querySelector('[class*="assistant"]');
       });
-      console.log(`[ChatGPT Turn Navigator] Found ${userMessages.length} ${this.i18n.getText('foundFallback')}`);
+      console.log(`${this.adapter.getLogPrefix()} Found ${userMessages.length} ${this.i18n.getText('foundFallback')}`);
     }
 
     userMessages.forEach((element, index) => {
@@ -95,48 +124,28 @@ class Navigator {
     };
 
     this.queries.push(query);
-    console.log(`[ChatGPT Turn Navigator] ${this.i18n.getText('added')} #${query.index + 1}: ${textContent.substring(0, 50)}...`);
+    console.log(`${this.adapter.getLogPrefix()} ${this.i18n.getText('added')} #${query.index + 1}: ${textContent.substring(0, 50)}...`);
   }
 
   // Extract text content from element
   extractTextContent(element) {
-    const clone = element.cloneNode(true);
-    const toRemove = clone.querySelectorAll('button, svg, img, [role="button"]');
-    toRemove.forEach(el => el.remove());
-
-    let text = clone.textContent.trim();
-    const maxLength = 100;
-    if (text.length > maxLength) {
-      text = text.substring(0, maxLength) + '...';
-    }
-
-    return text;
+    return this.adapter.extractMessageText(element);
   }
 
   // Start observing DOM changes
   startObserving() {
-    const config = {
-      childList: true,
-      subtree: true,
-      attributes: false
-    };
+    const target = this.adapter.getObserverTarget();
+    const config = this.adapter.getObserverConfig();
 
     this.observer = new MutationObserver((mutations) => {
       let hasNewMessages = false;
 
       mutations.forEach((mutation) => {
         mutation.addedNodes.forEach((node) => {
-          if (node.nodeType === Node.ELEMENT_NODE) {
-            if (this.isUserMessage(node)) {
-              this.addQuery(node);
-              hasNewMessages = true;
-            }
-
-            const userMessages = node.querySelectorAll?.('[data-message-author-role="user"]');
-            if (userMessages && userMessages.length > 0) {
-              userMessages.forEach(msg => this.addQuery(msg));
-              hasNewMessages = true;
-            }
+          const messages = this.adapter.findUserMessagesInNode(node);
+          if (messages.length > 0) {
+            messages.forEach(msg => this.addQuery(msg));
+            hasNewMessages = true;
           }
         });
       });
@@ -146,21 +155,20 @@ class Navigator {
       }
     });
 
-    this.observer.observe(document.body, config);
-    console.log(`[ChatGPT Turn Navigator] ${this.i18n.getText('observerStarted')}`);
+    this.observer.observe(target, config);
+    console.log(`${this.adapter.getLogPrefix()} ${this.i18n.getText('observerStarted')}`);
   }
 
   // Check if element is a user message
   isUserMessage(element) {
-    return element.hasAttribute?.('data-message-author-role') &&
-           element.getAttribute('data-message-author-role') === 'user';
+    return this.adapter.isUserMessage(element);
   }
 
   // Scroll to specific query
   scrollToQuery(index) {
     const query = this.queries[index];
     if (!query || !query.element) {
-      console.warn(`[ChatGPT Turn Navigator] ${this.i18n.getText('notFound')} #${index + 1} ${this.i18n.getText('notFoundSuffix')}`);
+      console.warn(`${this.adapter.getLogPrefix()} ${this.i18n.getText('notFound')} #${index + 1} ${this.i18n.getText('notFoundSuffix')}`);
       return;
     }
 
@@ -175,7 +183,7 @@ class Navigator {
     this.sidebar.updateActiveItem(index);
     this.currentActiveIndex = index;
 
-    console.log(`[ChatGPT Turn Navigator] ${this.i18n.getText('scrolled')} #${index + 1}`);
+    console.log(`${this.adapter.getLogPrefix()} ${this.i18n.getText('scrolled')} #${index + 1}`);
   }
 
   // Highlight element temporarily
@@ -239,9 +247,11 @@ class Navigator {
     const urlObserver = new MutationObserver(() => {
       const currentUrl = window.location.href;
       if (currentUrl !== lastUrl) {
-        console.log(`[ChatGPT Turn Navigator] ${this.i18n.getText('urlChanged')}`);
-        lastUrl = currentUrl;
-        this.handleConversationChange();
+        if (this.adapter.shouldReinitialize(lastUrl, currentUrl)) {
+          console.log(`${this.adapter.getLogPrefix()} ${this.i18n.getText('urlChanged')}`);
+          lastUrl = currentUrl;
+          this.handleConversationChange();
+        }
       }
     });
 
@@ -254,13 +264,16 @@ class Navigator {
       this.handleConversationChange();
     });
 
+    const pollingInterval = this.adapter.getUrlPollingInterval();
     setInterval(() => {
       const currentUrl = window.location.href;
       if (currentUrl !== this.currentConversationUrl) {
-        console.log(`[ChatGPT Turn Navigator] ${this.i18n.getText('urlChangedPolling')}`);
-        this.handleConversationChange();
+        if (this.adapter.shouldReinitialize(this.currentConversationUrl, currentUrl)) {
+          console.log(`${this.adapter.getLogPrefix()} ${this.i18n.getText('urlChangedPolling')}`);
+          this.handleConversationChange();
+        }
       }
-    }, 1000);
+    }, pollingInterval);
   }
 
   // Handle conversation change
@@ -284,9 +297,10 @@ class Navigator {
     // Re-insert expand button to fix missing button after conversation switch
     this.sidebar.reinsertExpandButton();
 
+    const delay = this.adapter.getConversationSwitchDelay();
     setTimeout(() => {
       this.scanExistingQueries();
-      console.log(`[ChatGPT Turn Navigator] ${this.i18n.getText('reloaded')}`);
-    }, 500);
+      console.log(`${this.adapter.getLogPrefix()} ${this.i18n.getText('reloaded')}`);
+    }, delay);
   }
 }

@@ -1,6 +1,12 @@
-# ChatGPT Turn Navigator
+# AI Chat Navigator
 
-A Chrome extension that adds a navigation sidebar to ChatGPT conversations, helping you quickly jump between user queries in long conversations.
+A Chrome extension that adds a navigation sidebar to AI chat conversations, helping you quickly jump between user queries in long conversations.
+
+## Supported Platforms
+
+- 🤖 **ChatGPT** (chatgpt.com, chat.openai.com)
+- 💬 **Microsoft Copilot** (copilot.microsoft.com, copilot.cloud.microsoft, m365.cloud.microsoft)
+- ✨ **Google Gemini** (gemini.google.com)
 
 ## Features
 
@@ -10,7 +16,8 @@ A Chrome extension that adds a navigation sidebar to ChatGPT conversations, help
 - 📏 **Resizable**: Drag to adjust sidebar width to your preference
 - 🌓 **Dark Mode**: Automatically adapts to system theme
 - 💾 **Persistent State**: Remembers sidebar visibility and width across sessions
-- ⚡ **Performance**: Lightweight and fast, no impact on ChatGPT performance
+- 🌍 **Multi-language**: Supports English and Chinese interface
+- ⚡ **Performance**: Lightweight and fast, no impact on chat performance
 
 ## Installation
 
@@ -36,7 +43,7 @@ Coming soon...
 
 ## Usage
 
-1. Open any ChatGPT conversation at https://chatgpt.com
+1. Open any supported AI chat platform (ChatGPT, Copilot, or Gemini)
 2. The navigation sidebar will appear on the right side
 3. Click any query in the sidebar to jump to that message
 4. Use the search box to filter queries
@@ -51,10 +58,22 @@ Coming soon...
 ```
 chatgpt-turn-navigator/
 ├── manifest.json       # Extension manifest
-├── content.js          # Main content script
+├── content.js          # Main entry point
 ├── sidebar.css         # Sidebar styles
+├── package.json        # Project metadata
+├── src/
+│   ├── i18n.js            # Internationalization
+│   ├── navigator.js       # Navigation logic
+│   ├── sidebar.js         # Sidebar component
+│   ├── platform-detector.js  # Platform detection
+│   └── adapters/          # Platform-specific adapters
+│       ├── base-adapter.js
+│       ├── chatgpt-adapter.js
+│       ├── copilot-adapter.js
+│       └── gemini-adapter.js
 ├── icons/              # Extension icons
-└── README.md
+├── docs/               # Documentation
+└── scripts/            # Development scripts
 ```
 
 ## Contributing

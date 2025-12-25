@@ -1,8 +1,10 @@
 // Sidebar UI module
 
 class Sidebar {
-  constructor(i18n) {
+  constructor(i18n, platformName = 'default', adapter = null) {
     this.i18n = i18n;
+    this.platformName = platformName;
+    this.adapter = adapter;
     this.element = null;
     this.expandButton = null;
     this.isVisible = true;
@@ -11,6 +13,11 @@ class Sidebar {
     this.onToggle = null;
     this.onSearch = null;
     this.onItemClick = null;
+  }
+
+  // Get platform-specific storage key
+  getStorageKey(key) {
+    return `${this.platformName}_${key}`;
   }
 
   // Create sidebar UI
@@ -24,6 +31,11 @@ class Sidebar {
     this.element = document.createElement('div');
     this.element.id = 'chatgpt-turn-finder-sidebar';
     this.element.className = 'ctn-sidebar';
+
+    // Apply initial hidden state if needed (before appending to DOM)
+    if (!this.isVisible) {
+      this.element.classList.add('ctn-hidden');
+    }
 
     this.element.innerHTML = `
       <div class="ctn-resize-handle" title="${this.i18n.getText('resize')}"></div>
@@ -149,6 +161,34 @@ class Sidebar {
 
   // Insert expand button to toolbar
   insertExpandButtonToToolbar() {
+    // Use platform-specific insertion points if adapter is available
+    if (this.adapter && typeof this.adapter.getExpandButtonInsertionPoints === 'function') {
+      const insertionPoints = this.adapter.getExpandButtonInsertionPoints();
+      
+      for (const point of insertionPoints) {
+        const targetElement = document.querySelector(point.selector);
+        if (targetElement) {
+          // If inserting into body, use container for proper positioning
+          if (point.selector === 'body') {
+            const container = document.createElement('div');
+            container.className = 'ctn-expand-btn-container';
+            container.appendChild(this.expandButton);
+            targetElement.appendChild(container);
+            console.log(`[${this.platformName}] Expand button inserted into body with container`);
+          } else if (point.insertMethod === 'prepend') {
+            targetElement.insertBefore(this.expandButton, targetElement.firstChild);
+            console.log(`[${this.platformName}] Expand button prepended to ${point.selector}`);
+          } else {
+            targetElement.appendChild(this.expandButton);
+            console.log(`[${this.platformName}] Expand button appended to ${point.selector}`);
+          }
+          return;
+        }
+      }
+      console.warn(`[${this.platformName}] No insertion points found, falling back to generic method`);
+    }
+
+    // Fallback to generic ChatGPT-specific logic
     const actionsContainer = document.querySelector('#conversation-header-actions');
 
     if (actionsContainer) {
@@ -186,7 +226,7 @@ class Sidebar {
       this.expandButton.classList.remove('ctn-hidden');
     }
 
-    chrome.storage.local.set({ sidebarVisible: this.isVisible });
+    chrome.storage.local.set({ [this.getStorageKey('sidebarVisible')]: this.isVisible });
     console.log(`[ChatGPT Turn Navigator] Sidebar ${this.isVisible ? this.i18n.getText('shown') : this.i18n.getText('hidden')}`);
 
     if (this.onToggle) {
@@ -194,15 +234,29 @@ class Sidebar {
     }
   }
 
-  // Restore visibility state
-  restoreState() {
-    chrome.storage.local.get(['sidebarVisible'], (result) => {
-      if (result.sidebarVisible === false) {
-        this.isVisible = false;
-        this.element.classList.add('ctn-hidden');
-        this.expandButton.classList.remove('ctn-hidden');
-      }
+  // Restore visibility state (synchronous, called before create)
+  async restoreState() {
+    return new Promise((resolve) => {
+      const visibilityKey = this.getStorageKey('sidebarVisible');
+      const widthKey = this.getStorageKey('sidebarWidth');
+      
+      chrome.storage.local.get([visibilityKey, widthKey], (result) => {
+        if (result[visibilityKey] === false) {
+          this.isVisible = false;
+        }
+        if (result[widthKey]) {
+          this.width = result[widthKey];
+        }
+        resolve();
+      });
     });
+  }
+
+  // Update expand button visibility (called after sidebar is created)
+  updateExpandButtonVisibility() {
+    if (!this.isVisible && this.expandButton) {
+      this.expandButton.classList.remove('ctn-hidden');
+    }
   }
 
   // Setup resize handle
@@ -235,19 +289,17 @@ class Sidebar {
         document.body.style.cursor = '';
         document.body.style.userSelect = '';
 
-        chrome.storage.local.set({ sidebarWidth: this.width });
+        chrome.storage.local.set({ [this.getStorageKey('sidebarWidth')]: this.width });
       }
     });
   }
 
   // Restore sidebar width
   restoreWidth() {
-    chrome.storage.local.get(['sidebarWidth'], (result) => {
-      if (result.sidebarWidth) {
-        this.width = result.sidebarWidth;
-        this.element.style.width = `${this.width}px`;
-      }
-    });
+    // Width already restored in restoreState, just apply it
+    if (this.width) {
+      this.element.style.width = `${this.width}px`;
+    }
   }
 
   // Re-insert expand button (for conversation changes)

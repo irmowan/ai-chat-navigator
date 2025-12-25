@@ -3,9 +3,7 @@
   "version": "1.0.0",
   "description": "A Chrome extension that adds a navigation sidebar to ChatGPT conversations",
   "scripts": {
-    "build": "echo 'No build step required'",
-    "generate-icons": "node scripts/generate-icons.js",
-    "package": "node scripts/package.js"
+    "build": "echo 'No build step required'"
   },
   "keywords": [
     "chatgpt",
