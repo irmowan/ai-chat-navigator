@@ -1,0 +1,29 @@
+{
+  "name": "ai-turn-navigator",
+  "version": "1.0.0",
+  "description": "A browser extension for navigating AI conversations with a floating sidebar",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "chrome-extension",
+    "chatgpt",
+    "navigation",
+    "ai"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@crxjs/vite-plugin": "^2.3.0",
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/chrome": "^0.1.36",
+    "autoprefixer": "^10.4.23",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.9.3",
+    "vite": "^5.4.21"
+  }
+}

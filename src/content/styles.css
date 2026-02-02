@@ -1,0 +1,273 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Toolbar Button - injected into ChatGPT's header */
+.ai-nav-toolbar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #6b7280;
+  transition: all 0.15s ease;
+}
+
+.ai-nav-toolbar-btn:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.ai-nav-toolbar-btn-active {
+  color: #10a37f;
+  background: #ecfdf5;
+}
+
+.ai-nav-toolbar-btn-active:hover {
+  background: #d1fae5;
+}
+
+@media (prefers-color-scheme: dark) {
+  .ai-nav-toolbar-btn {
+    color: #9ca3af;
+  }
+
+  .ai-nav-toolbar-btn:hover {
+    background: #374151;
+    color: #f9fafb;
+  }
+
+  .ai-nav-toolbar-btn-active {
+    color: #10a37f;
+    background: #064e3b;
+  }
+
+  .ai-nav-toolbar-btn-active:hover {
+    background: #065f46;
+  }
+}
+
+/* Navigator Panel */
+.ai-nav-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  background: white;
+  border-left: 1px solid #e5e7eb;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  z-index: 9999;
+  transition: transform 0.2s ease;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .ai-nav-panel {
+    background: #1f2937;
+    border-left-color: #374151;
+  }
+}
+
+/* Header */
+.ai-nav-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+@media (prefers-color-scheme: dark) {
+  .ai-nav-header {
+    border-bottom-color: #374151;
+  }
+}
+
+.ai-nav-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .ai-nav-title {
+    color: #f9fafb;
+  }
+}
+
+/* Close button in header */
+.ai-nav-close-btn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1.25rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  transition: all 0.15s ease;
+}
+
+.ai-nav-close-btn:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+@media (prefers-color-scheme: dark) {
+  .ai-nav-close-btn {
+    color: #9ca3af;
+  }
+
+  .ai-nav-close-btn:hover {
+    background: #374151;
+    color: #f9fafb;
+  }
+}
+
+/* Search Bar */
+.ai-nav-search-bar {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+@media (prefers-color-scheme: dark) {
+  .ai-nav-search-bar {
+    border-bottom-color: #374151;
+  }
+}
+
+.ai-nav-search-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.ai-nav-search-input:focus {
+  border-color: #10a37f;
+}
+
+@media (prefers-color-scheme: dark) {
+  .ai-nav-search-input {
+    background: #374151;
+    border-color: #4b5563;
+    color: #f9fafb;
+  }
+
+  .ai-nav-search-input:focus {
+    border-color: #10a37f;
+  }
+}
+
+/* Turn List */
+.ai-nav-turn-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+/* Turn Item */
+.ai-nav-turn-item {
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+  border: 1px solid transparent;
+}
+
+.ai-nav-turn-item:hover {
+  background: #f3f4f6;
+}
+
+.ai-nav-turn-item.ai-nav-turn-active {
+  background: #ecfdf5;
+  border-color: #10a37f;
+}
+
+@media (prefers-color-scheme: dark) {
+  .ai-nav-turn-item:hover {
+    background: #374151;
+  }
+
+  .ai-nav-turn-item.ai-nav-turn-active {
+    background: #064e3b;
+    border-color: #10a37f;
+  }
+}
+
+.ai-nav-turn-content {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: #374151;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+@media (prefers-color-scheme: dark) {
+  .ai-nav-turn-content {
+    color: #d1d5db;
+  }
+}
+
+/* Highlight Effect */
+.ai-nav-highlight {
+  animation: highlight-pulse 2s ease-in-out;
+  outline: 2px solid #10a37f;
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+@keyframes highlight-pulse {
+  0%, 100% {
+    outline-color: transparent;
+  }
+  50% {
+    outline-color: #10a37f;
+  }
+}
+
+/* Scrollbar Styling */
+.ai-nav-turn-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ai-nav-turn-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ai-nav-turn-list::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.ai-nav-turn-list::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+@media (prefers-color-scheme: dark) {
+  .ai-nav-turn-list::-webkit-scrollbar-thumb {
+    background: #4b5563;
+  }
+
+  .ai-nav-turn-list::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+  }
+}
