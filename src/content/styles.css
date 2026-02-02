@@ -66,6 +66,22 @@ html.dark .ai-nav-toolbar-btn-active,
   background: rgba(16, 163, 127, 0.2);
 }
 
+/* Button icon animation */
+.ai-nav-btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.ai-nav-toolbar-btn:hover .ai-nav-btn-icon {
+  transform: translateX(-2px);
+}
+
+.ai-nav-toolbar-btn-active:hover .ai-nav-btn-icon {
+  transform: translateX(2px);
+}
+
 /* Navigator Panel */
 .ai-nav-panel {
   position: fixed;
@@ -79,8 +95,15 @@ html.dark .ai-nav-toolbar-btn-active,
   display: flex;
   flex-direction: column;
   z-index: 10000;
-  transition: transform 0.3s ease;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  /* Smooth slide animation */
+  transform: translateX(0);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Collapsed state - slide out to right */
+.ai-nav-panel.ai-nav-panel-collapsed {
+  transform: translateX(100%);
 }
 
 /* Dark mode support */
@@ -145,8 +168,8 @@ html.dark .ai-nav-title,
   color: #ececec;
 }
 
-/* Close button in header */
-.ai-nav-close-btn {
+/* Collapse button in header (replaces close button) */
+.ai-nav-collapse-btn {
   background: transparent;
   border: none;
   cursor: pointer;
@@ -156,33 +179,40 @@ html.dark .ai-nav-title,
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s;
+  transition: all 0.2s ease;
 }
 
-.ai-nav-close-btn:hover {
+.ai-nav-collapse-btn:hover {
   background: rgba(0, 0, 0, 0.05);
+  color: #333;
+}
+
+.ai-nav-collapse-btn:hover .ai-nav-btn-icon {
+  transform: translateX(2px);
 }
 
 @media (prefers-color-scheme: dark) {
-  .ai-nav-close-btn {
+  .ai-nav-collapse-btn {
     color: #aaa;
   }
 
-  .ai-nav-close-btn:hover {
+  .ai-nav-collapse-btn:hover {
     background: rgba(255, 255, 255, 0.1);
+    color: #fff;
   }
 }
 
-html.dark .ai-nav-close-btn,
-[data-theme="dark"] .ai-nav-close-btn,
-.dark .ai-nav-close-btn {
+html.dark .ai-nav-collapse-btn,
+[data-theme="dark"] .ai-nav-collapse-btn,
+.dark .ai-nav-collapse-btn {
   color: #aaa;
 }
 
-html.dark .ai-nav-close-btn:hover,
-[data-theme="dark"] .ai-nav-close-btn:hover,
-.dark .ai-nav-close-btn:hover {
+html.dark .ai-nav-collapse-btn:hover,
+[data-theme="dark"] .ai-nav-collapse-btn:hover,
+.dark .ai-nav-collapse-btn:hover {
   background: rgba(255, 255, 255, 0.1);
+  color: #fff;
 }
 
 /* Search Bar */
@@ -210,13 +240,14 @@ html.dark .ai-nav-search-bar,
   border-radius: 6px;
   font-size: 14px;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
   background: #fff;
   color: #202123;
 }
 
 .ai-nav-search-input:focus {
   border-color: #10a37f;
+  box-shadow: 0 0 0 2px rgba(16, 163, 127, 0.1);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -228,6 +259,7 @@ html.dark .ai-nav-search-bar,
 
   .ai-nav-search-input:focus {
     border-color: #10a37f;
+    box-shadow: 0 0 0 2px rgba(16, 163, 127, 0.2);
   }
 }
 
@@ -243,6 +275,7 @@ html.dark .ai-nav-search-input:focus,
 [data-theme="dark"] .ai-nav-search-input:focus,
 .dark .ai-nav-search-input:focus {
   border-color: #10a37f;
+  box-shadow: 0 0 0 2px rgba(16, 163, 127, 0.2);
 }
 
 /* Turn List */
@@ -301,7 +334,7 @@ html.dark .ai-nav-turn-list::-webkit-scrollbar-thumb:hover,
   margin-bottom: 4px;
   border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   background: #f9f9f9;
   border: 1px solid transparent;
 }

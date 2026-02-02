@@ -16,6 +16,8 @@ export class NavigatorPanel {
   private currentTurnId: string | null = null;
   private onTurnClick: ((turnId: string) => void) | null = null;
   private toolbarButton: HTMLElement | null = null;
+  private toolbarButtonIcon: HTMLElement | null = null;
+  private collapseButtonIcon: HTMLElement | null = null;
   private hasTurns: boolean = false;
 
   constructor() {
@@ -23,7 +25,7 @@ export class NavigatorPanel {
     this.container.className = CONSTANTS.CLASSES.NAVIGATOR_PANEL;
     this.container.style.width = `${CONSTANTS.NAVIGATOR_WIDTH}px`;
 
-    // Create header with close button
+    // Create header with collapse button
     this.header = this.createHeader();
     this.container.appendChild(this.header);
 
@@ -36,12 +38,23 @@ export class NavigatorPanel {
     this.turnList.className = 'ai-nav-turn-list';
     this.container.appendChild(this.turnList);
 
-    // Inject panel into page (hidden by default)
-    this.container.style.display = 'none';
+    // Inject panel into page (collapsed by default)
+    this.container.classList.add('ai-nav-panel-collapsed');
     document.body.appendChild(this.container);
 
     // Inject toolbar button
     this.injectToolbarButton();
+  }
+
+  private createChevronIcon(direction: 'left' | 'right'): string {
+    const path = direction === 'left'
+      ? 'M15 19l-7-7 7-7'  // <
+      : 'M9 5l7 7-7 7';     // >
+    return `
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="${path}"/>
+      </svg>
+    `;
   }
 
   private createHeader(): HTMLElement {
@@ -52,20 +65,21 @@ export class NavigatorPanel {
     title.className = 'ai-nav-title';
     title.textContent = 'Navigator';
 
-    const closeBtn = document.createElement('button');
-    closeBtn.className = 'ai-nav-close-btn';
-    closeBtn.innerHTML = `
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M18 6L6 18M6 6l12 12"/>
-      </svg>
-    `;
-    closeBtn.title = 'Close navigator';
-    closeBtn.addEventListener('click', () => {
+    const collapseBtn = document.createElement('button');
+    collapseBtn.className = 'ai-nav-collapse-btn';
+    collapseBtn.title = 'Collapse navigator';
+
+    this.collapseButtonIcon = document.createElement('span');
+    this.collapseButtonIcon.className = 'ai-nav-btn-icon';
+    this.collapseButtonIcon.innerHTML = this.createChevronIcon('right');
+    collapseBtn.appendChild(this.collapseButtonIcon);
+
+    collapseBtn.addEventListener('click', () => {
       this.collapse();
     });
 
     header.appendChild(title);
-    header.appendChild(closeBtn);
+    header.appendChild(collapseBtn);
 
     return header;
   }
@@ -82,12 +96,13 @@ export class NavigatorPanel {
       if (toolbar && !document.querySelector('.ai-nav-toolbar-btn')) {
         this.toolbarButton = document.createElement('button');
         this.toolbarButton.className = 'ai-nav-toolbar-btn';
-        this.toolbarButton.innerHTML = `
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M4 6h16M4 12h16M4 18h16"/>
-          </svg>
-        `;
-        this.toolbarButton.title = 'Toggle Navigator';
+
+        this.toolbarButtonIcon = document.createElement('span');
+        this.toolbarButtonIcon.className = 'ai-nav-btn-icon';
+        this.toolbarButtonIcon.innerHTML = this.createChevronIcon('left');
+        this.toolbarButton.appendChild(this.toolbarButtonIcon);
+
+        this.toolbarButton.title = 'Open Navigator';
         this.toolbarButton.style.display = 'none'; // Hidden until we have turns
         this.toolbarButton.addEventListener('click', () => {
           this.toggle();
@@ -137,17 +152,6 @@ export class NavigatorPanel {
     this.hasTurns = turns.length > 0;
     this.updateToolbarButtonVisibility();
 
-    // Hide panel if no turns
-    if (turns.length === 0) {
-      this.container.style.display = 'none';
-      return;
-    }
-
-    // Show panel if expanded and has turns
-    if (this.isExpanded) {
-      this.container.style.display = 'flex';
-    }
-
     // Create new items
     turns.forEach((turn, index) => {
       const item = new TurnItem(turn, index);
@@ -183,26 +187,28 @@ export class NavigatorPanel {
 
   expand(): void {
     this.isExpanded = true;
-    if (this.hasTurns) {
-      this.container.style.display = 'flex';
-    }
+    this.container.classList.remove('ai-nav-panel-collapsed');
     this.updateToolbarButtonState();
     this.saveState();
   }
 
   collapse(): void {
     this.isExpanded = false;
-    this.container.style.display = 'none';
+    this.container.classList.add('ai-nav-panel-collapsed');
     this.updateToolbarButtonState();
     this.saveState();
   }
 
   private updateToolbarButtonState(): void {
-    if (this.toolbarButton) {
+    if (this.toolbarButton && this.toolbarButtonIcon) {
       if (this.isExpanded) {
         this.toolbarButton.classList.add('ai-nav-toolbar-btn-active');
+        this.toolbarButtonIcon.innerHTML = this.createChevronIcon('right');
+        this.toolbarButton.title = 'Close Navigator';
       } else {
         this.toolbarButton.classList.remove('ai-nav-toolbar-btn-active');
+        this.toolbarButtonIcon.innerHTML = this.createChevronIcon('left');
+        this.toolbarButton.title = 'Open Navigator';
       }
     }
   }
