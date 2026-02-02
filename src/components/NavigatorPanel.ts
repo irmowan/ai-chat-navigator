@@ -54,7 +54,11 @@ export class NavigatorPanel {
 
     const closeBtn = document.createElement('button');
     closeBtn.className = 'ai-nav-close-btn';
-    closeBtn.innerHTML = '&times;';
+    closeBtn.innerHTML = `
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 6L6 18M6 6l12 12"/>
+      </svg>
+    `;
     closeBtn.title = 'Close navigator';
     closeBtn.addEventListener('click', () => {
       this.collapse();
@@ -145,8 +149,8 @@ export class NavigatorPanel {
     }
 
     // Create new items
-    turns.forEach(turn => {
-      const item = new TurnItem(turn);
+    turns.forEach((turn, index) => {
+      const item = new TurnItem(turn, index);
       item.setOnClick((turnId) => {
         this.onTurnClick?.(turnId);
       });
