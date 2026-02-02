@@ -1,184 +1,122 @@
 # AI Turn Navigator
 
-A browser extension that adds a floating sidebar to AI conversation platforms like ChatGPT, Gemini, and Copilot for easy navigation between conversation turns.
+<p align="center">
+  <img src="public/icons/icon128.png" alt="AI Turn Navigator" width="128" height="128">
+</p>
+
+<p align="center">
+  <strong>Navigate long AI conversations with ease</strong>
+</p>
+
+<p align="center">
+  A browser extension that adds a floating navigation sidebar to AI chat platforms, making it easy to jump between conversation turns.
+</p>
+
+<p align="center">
+  <a href="#features">Features</a> •
+  <a href="#installation">Installation</a> •
+  <a href="#usage">Usage</a> •
+  <a href="#keyboard-shortcuts">Shortcuts</a> •
+  <a href="#supported-platforms">Platforms</a>
+</p>
+
+---
 
 ## Features
 
-- **Right-side floating panel** with collapsible navigator
-- **Conversation turn detection** - displays the first 50 characters of each user question
-- **Click to jump** - smooth scroll to any conversation turn with highlight effect
-- **Auto-positioning** - automatically highlights current position as you scroll
-- **Search/filter** - quickly find specific conversation turns
-- **Keyboard shortcuts**:
-  - `Ctrl/Cmd + ↑` - Navigate to previous turn
-  - `Ctrl/Cmd + ↓` - Navigate to next turn
-  - `n` - Toggle navigator panel
-- **Multi-platform support** - extensible architecture for ChatGPT, Gemini, Copilot, and more
+- **Floating Sidebar** — A sleek navigation panel on the right side of your screen
+- **Quick Navigation** — Click any turn to instantly jump to that part of the conversation
+- **Visual Highlighting** — See exactly where you are with smooth highlight animations
+- **Search & Filter** — Quickly find specific messages in long conversations
+- **Auto-tracking** — The sidebar automatically follows your scroll position
+- **Dark Mode** — Seamlessly adapts to your system and ChatGPT theme
+- **Keyboard Shortcuts** — Navigate without touching your mouse
 
 ## Installation
 
-### Development Build
+### From Source (Developer Mode)
 
-1. Install dependencies:
+1. Download or clone this repository
+2. Install dependencies and build:
    ```bash
    npm install
-   ```
-
-2. Build the extension:
-   ```bash
    npm run build
    ```
-
-3. Load in Chrome:
-   - Open `chrome://extensions/`
-   - Enable "Developer mode"
-   - Click "Load unpacked"
-   - Select the `dist/` directory
-
-The extension should now load without errors and be ready to use on ChatGPT.
-
-### Development Mode (with HMR)
-
-```bash
-npm run dev
-```
-
-This starts Vite in development mode with hot module replacement.
-
-## Project Structure
-
-```
-ai-turn-navigator/
-├── src/
-│   ├── core/                      # Platform-agnostic core logic
-│   │   ├── navigator.ts           # Main navigator controller
-│   │   ├── scroll-tracker.ts      # Scroll position tracking
-│   │   └── keyboard-handler.ts    # Keyboard shortcuts
-│   ├── platforms/                 # Platform-specific adapters
-│   │   ├── base/
-│   │   │   └── PlatformAdapter.ts # Abstract adapter interface
-│   │   ├── chatgpt/
-│   │   │   ├── ChatGPTAdapter.ts  # ChatGPT implementation
-│   │   │   └── dom-selectors.ts   # DOM selectors for ChatGPT
-│   │   ├── gemini/                # Gemini support (planned)
-│   │   └── copilot/               # Copilot support (planned)
-│   ├── components/                # UI components
-│   │   ├── NavigatorPanel.ts      # Main sidebar panel
-│   │   ├── TurnItem.ts            # Individual turn items
-│   │   └── SearchBar.ts           # Search functionality
-│   ├── utils/                     # Utilities
-│   │   ├── platform-detector.ts   # Auto-detect platform
-│   │   ├── storage.ts             # Chrome storage wrapper
-│   │   └── constants.ts           # Constants
-│   ├── content/
-│   │   ├── index.ts               # Content script entry
-│   │   └── styles.css             # UI styles
-│   └── types/
-│       └── index.ts               # TypeScript types
-├── public/
-│   └── manifest.json              # Chrome extension manifest
-└── dist/                          # Built extension (generated)
-```
-
-## Architecture
-
-### Multi-Platform Design
-
-The extension uses the **Adapter Pattern** to support multiple AI platforms:
-
-1. **PlatformAdapter** (abstract base class) - Defines the interface for platform-specific logic
-2. **ChatGPTAdapter** - ChatGPT-specific DOM parsing and observation
-3. **GeminiAdapter** - Gemini support (placeholder for future implementation)
-4. **CopilotAdapter** - Copilot support (placeholder for future implementation)
-
-To add a new platform:
-1. Create a new adapter extending `PlatformAdapter`
-2. Implement the required methods (`parseConversations`, `observeNewMessages`, etc.)
-3. Add the adapter to `platform-detector.ts`
-
-### Core Components
-
-- **Navigator** - Platform-agnostic navigation logic
-- **ScrollTracker** - Uses IntersectionObserver to track visible conversation turns
-- **KeyboardHandler** - Global keyboard shortcut management
-- **NavigatorPanel** - UI component for the sidebar
+3. Open Chrome and go to `chrome://extensions/`
+4. Enable **Developer mode** (toggle in top right)
+5. Click **Load unpacked**
+6. Select the `dist/` folder
 
 ## Usage
 
-1. Navigate to ChatGPT (https://chatgpt.com)
-2. Start or continue a conversation
-3. The navigator panel appears on the right side
-4. Click any conversation turn to jump to it
-5. Use the search bar to filter turns
-6. Press `n` to collapse/expand the panel
+1. Go to [ChatGPT](https://chatgpt.com) and open any conversation
+2. Look for the **`<`** button in the top-right toolbar
+3. Click it to open the navigator sidebar
+4. Each conversation turn shows a numbered preview of your message
+5. Click any item to jump directly to that turn
 
-## Current Platform Support
+<details>
+<summary><strong>Tips for long conversations</strong></summary>
 
-- ✅ **ChatGPT** (chatgpt.com, chat.openai.com) - Fully implemented
-- ⏳ **Gemini** (gemini.google.com) - Planned
-- ⏳ **Copilot** (copilot.microsoft.com) - Planned
+- Use the **search bar** to filter turns by keyword
+- Press **`n`** to quickly toggle the sidebar
+- The **green border** indicates your current position
+- Turns are numbered (`#1`, `#2`, etc.) for easy reference
 
-## Development Notes
+</details>
 
-### Testing with Playwright MCP
+## Keyboard Shortcuts
 
-The extension can be tested using Playwright MCP tools:
+| Shortcut | Action |
+|----------|--------|
+| `n` | Toggle navigator sidebar |
+| `Ctrl/Cmd + ↑` | Go to previous turn |
+| `Ctrl/Cmd + ↓` | Go to next turn |
 
-```javascript
-// Navigate to ChatGPT
-await browser_navigate('https://chatgpt.com');
+## Supported Platforms
 
-// Take a snapshot to verify the navigator appears
-await browser_snapshot();
+| Platform | Status |
+|----------|--------|
+| [ChatGPT](https://chatgpt.com) | ✅ Fully supported |
+| [Gemini](https://gemini.google.com) | 🚧 Coming soon |
+| [Copilot](https://copilot.microsoft.com) | 🚧 Coming soon |
 
-// Take a screenshot
-await browser_take_screenshot({ filename: 'navigator-test.png' });
+## Screenshots
 
-// Test clicking on a turn item
-await browser_click({ ref: 'turn-item-ref' });
+*Coming soon*
 
-// Check console for errors
-await browser_console_messages({ level: 'error' });
+## Development
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server with hot reload
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
 ```
 
-### Debugging
-
-Enable verbose logging by checking the browser console:
-- Look for messages prefixed with `[AI Navigator]`
-- Check for DOM parsing results
-- Monitor MutationObserver activity
-
-### ChatGPT DOM Structure
-
-The ChatGPT adapter uses multiple selector strategies to handle potential DOM changes:
-- Conversation containers: `main` element
-- Message groups: `[data-testid^="conversation-turn"]`, `article`, etc.
-- User messages: `[data-message-author-role="user"]`
-- AI responses: `[data-message-author-role="assistant"]`
-
-## Technical Stack
-
-- **TypeScript** - Type-safe development
-- **Vite** - Fast build tool with HMR
-- **@crxjs/vite-plugin** - Chrome extension support for Vite
-- **Tailwind CSS v4** - Utility-first styling
-- **Chrome Extension Manifest V3** - Modern extension API
-
-## Known Issues
-
-- Icon files are not included in the current build (extension works but has no icon)
-- ChatGPT's DOM structure may change, requiring selector updates
-- Gemini and Copilot adapters are placeholders
+See [CLAUDE.md](CLAUDE.md) for detailed development documentation.
 
 ## Contributing
 
-To add support for a new platform:
+Contributions are welcome! Feel free to:
 
-1. Create `src/platforms/yourplatform/YourPlatformAdapter.ts`
-2. Extend `PlatformAdapter` and implement all abstract methods
-3. Add DOM selectors in `src/platforms/yourplatform/dom-selectors.ts`
-4. Register the adapter in `src/utils/platform-detector.ts`
+- 🐛 Report bugs
+- 💡 Suggest features
+- 🔧 Submit pull requests
 
 ## License
 
 MIT
+
+---
+
+<p align="center">
+  Made with ❤️ for AI power users
+</p>
