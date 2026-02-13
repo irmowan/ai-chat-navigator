@@ -34,7 +34,17 @@
 
 ## Installation
 
-### From Source (Developer Mode)
+### Option 1: Download from Releases (recommended)
+
+1. Go to [Releases](https://github.com/irmowan/ai-chat-navigator/releases)
+2. Download the latest `ai-chat-navigator-<version>.zip`
+3. Unzip it to a local folder
+4. Open Chrome and go to `chrome://extensions/`
+5. Enable **Developer mode** (toggle in top right)
+6. Click **Load unpacked**
+7. Select the unzipped folder
+
+### Option 2: Build from Source (Developer Mode)
 
 1. Download or clone this repository
 2. Install dependencies and build:
